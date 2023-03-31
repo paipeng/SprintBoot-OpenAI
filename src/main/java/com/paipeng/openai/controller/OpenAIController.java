@@ -37,7 +37,7 @@ public class OpenAIController {
                         "Animal: " + text + "\n" +
                         "Names:")
                 .model("text-davinci-003")
-                .echo(true)
+                .echo(false)
                 .build();
         service.createCompletion(completionRequest).getChoices().forEach(System.out::println);
 
