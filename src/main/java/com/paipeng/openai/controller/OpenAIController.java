@@ -43,4 +43,27 @@ public class OpenAIController {
 
         return service.createCompletion(completionRequest).getChoices().get(0).getText();
     }
+
+
+    @GetMapping(value = "/zh/{text}", produces = {"application/json;charset=UTF-8"})
+    public String openAIChinese(@PathVariable("text") String text) {
+        log.info("openAI: " + text);
+        log.info("apiKey: " + applicationConfig.getApiKey());
+        OpenAiService service = new OpenAiService(applicationConfig.getApiKey());
+        CompletionRequest completionRequest = CompletionRequest.builder()
+                .prompt("给自己的宠物起三个女孩名字.\n" +
+                        "\n" +
+                        "动物: 猫\n" +
+                        "名字: 小天使, 小可爱, 小柔\n" +
+                        "动物: 狗\n" +
+                        "名字: 小花, 黑宝, 冰雪\n" +
+                        "动物: " + text + "\n" +
+                        "名字:")
+                .model("text-davinci-003")
+                .echo(false)
+                .build();
+        service.createCompletion(completionRequest).getChoices().forEach(System.out::println);
+
+        return service.createCompletion(completionRequest).getChoices().get(0).getText();
+    }
 }
