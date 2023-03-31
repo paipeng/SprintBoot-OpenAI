@@ -1,6 +1,6 @@
-package com.paipeng.springboot.controller;
+package com.paipeng.openai.controller;
 
-import com.paipeng.springboot.config.VersionConfig;
+import com.paipeng.openai.config.VersionConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

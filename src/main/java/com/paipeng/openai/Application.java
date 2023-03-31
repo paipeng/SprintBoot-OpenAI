@@ -1,4 +1,4 @@
-package com.paipeng.springboot;
+package com.paipeng.openai;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
