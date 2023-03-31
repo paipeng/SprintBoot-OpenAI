@@ -12,6 +12,7 @@ import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,8 +23,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import static com.theokanning.openai.service.OpenAiService.defaultRetrofit;
 
 @RestController
 @RequestMapping(value = "/openai")
@@ -36,6 +35,7 @@ public class OpenAIController {
     public OpenAIController() {
         this.log = LoggerFactory.getLogger(this.getClass().getName());
     }
+
     @GetMapping(value = "/ada/{text}", produces = {"application/json;charset=UTF-8"})
     public String openAI(@PathVariable("text") String text) {
         log.info("openAI: " + text);
@@ -82,14 +82,17 @@ public class OpenAIController {
     }
 
 
-
-    @GetMapping(value = "/gpt/{text}", produces = {"application/json;charset=UTF-8"})
-    public String openAIGPT35(@PathVariable("text") String text) {
+    @GetMapping(value = {"/gpt/{text}", "/gpt/{text}/{tokenSize}"}, produces = {"application/json;charset=UTF-8"})
+    public String openAIGPT35(@PathVariable("text") String text, @Nullable  @PathVariable("tokenSize") Integer tokenSize) {
         log.info("openAI: " + text);
+        log.info("tokenSize: " + tokenSize);
         log.info("apiKey: " + applicationConfig.getApiKey());
+        if (tokenSize == null ||  tokenSize <= 0) {
+            tokenSize = 50;
+        }
 
         ObjectMapper mapper = OpenAiService.defaultObjectMapper();
-        OkHttpClient client = OpenAiService.defaultClient(applicationConfig.getApiKey(), Duration.ofSeconds(15))
+        OkHttpClient client = OpenAiService.defaultClient(applicationConfig.getApiKey(), Duration.ofSeconds(30))
                 .newBuilder()
                 //.interceptor(HttpLoggingInterceptor())
                 .build();
@@ -97,7 +100,6 @@ public class OpenAIController {
 
         OpenAiApi api = retrofit.create(OpenAiApi.class);
         OpenAiService service = new OpenAiService(api);
-
 
 
         //OpenAiService service = new OpenAiService(applicationConfig.getApiKey());
@@ -120,7 +122,7 @@ public class OpenAIController {
                 .messages(chatMessages)
                 .model("gpt-3.5-turbo")
                 .n(5)
-                .maxTokens(80)
+                .maxTokens(tokenSize)
                 .logitBias(new HashMap<>())
                 .build();
         //service.createChatCompletion(chatCompletionRequest).getChoices().forEach(System.out::println);
